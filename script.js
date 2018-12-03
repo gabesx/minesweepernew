@@ -54,8 +54,8 @@ function initBoard(length, width) {
       board[i].push({
         isBomb: false,
         isOpen: false,
-        showBoard: "_",
-        showCheat: "_"
+        showBoard: "-",
+        showCheat: "-"
       })
     }
   }
@@ -160,8 +160,13 @@ function gameOver(win = false) {
 }
 
 function printBoard(cheat = false) {
-  let stringToPrint = ""
+  let stringToPrint = "  "
+  for (let col = 0; col < board[0].length; col++) {
+    stringToPrint += `${col + 1} `
+  }
+  stringToPrint += "\n"
   for (let i = 0; i < board.length; i++) {
+    stringToPrint += `${i+ 1} `
     for (let j = 0; j < board[0].length; j++) {
       stringToPrint += cheat === false ? `${board[i][j].showBoard} ` : `${board[i][j].showCheat} `
     }
