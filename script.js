@@ -2,6 +2,9 @@ var boardElm = document.querySelector(".board")
 var boardCheatElm = document.querySelector(".boardCheat")
 var textCoord = document.querySelector(".inputCoord")
 var submitCoord = document.querySelector(".submitCoord")
+var boardInputElm = document.querySelector(".boardInput")
+var submitBoardElm = document.querySelector(".submitBoard")
+var bombInputElm = document.querySelector(".bombInput")
 boardElm.style.whiteSpace = 'pre'
 boardCheatElm.style.whiteSpace = 'pre'
 
@@ -18,6 +21,28 @@ const NEIGHBOR = [
   { row: 1, col: -1 },
   { row: 0, col: -1 },
 ]
+
+submitBoardElm.addEventListener('click', init)
+
+function init() {
+  var boardRaw = boardInputElm.value.split(",")
+  if (isValidBoard(Number(boardRaw[0]), Number(boardRaw[1]))) {
+    initBoard(Number(boardRaw[0]), Number(boardRaw[1]))
+  } else {
+    return
+  }
+
+  var manyBomb = Number(bombInputElm.value)
+
+  if (isValidBomb(manyBomb)) {
+    initBomb(manyBomb)
+  } else {
+    return
+  }
+
+  printBoard(true)
+  printBoard()
+}
 
 submitCoord.addEventListener('click', submitCoordAction)
 
@@ -41,13 +66,13 @@ function submitCoordAction() {
   checkTile(Number(coordRaw[0]) - 1, Number(coordRaw[1]) - 1)
   printBoard()
   if (board.length * board[0].length - openCount === bomb) {
-    console.log("menang")
+    return gameOver(true)
   }
 }
 
 function initBomb(bombs) {
-  let col = Math.floor(Math.random() * board.length)
-  let row = Math.floor(Math.random() * board[0].length)
+  let col = Math.floor(Math.random() * board[0].length)
+  let row = Math.floor(Math.random() * board.length)
   bomb = bombs
   while (bombs > 0) {
     if (board[row][col].isBomb === false) {
@@ -55,8 +80,8 @@ function initBomb(bombs) {
       board[row][col].showCheat = "*"
       bombs--
     } else {
-      col = Math.floor(Math.random() * board.length)
-      row = Math.floor(Math.random() * board[0].length)
+      col = Math.floor(Math.random() * board[0].length)
+      row = Math.floor(Math.random() * board.length)
     }
   }
 }
@@ -94,13 +119,13 @@ function checkTile(row, col) {
 
   if (board[row][col].isBomb === true) {
     board[row][col].isOpen = true
-    return
+    return gameOver()
   }
 
   NEIGHBOR.forEach(elm => {
     let newRow = row + elm.row;
     let newCol = col + elm.col;
-    if (newRow < board[0].length && newRow >= 0 && newCol < board.length && newCol >= 0) {
+    if (newRow < board.length && newRow >= 0 && newCol < board[0].length && newCol >= 0) {
       if (board[newRow][newCol].isBomb === true) {
         count++
       }
@@ -124,6 +149,16 @@ function checkTile(row, col) {
   }
 }
 
+function gameOver(win = false) {
+  if (win) {
+    console.log("menang")
+  } else {
+    console.log("kalah")
+  }
+
+  submitCoord.disabled = true
+}
+
 function printBoard(cheat = false) {
   let stringToPrint = ""
   for (let i = 0; i < board.length; i++) {
@@ -135,22 +170,3 @@ function printBoard(cheat = false) {
 
    return cheat === false ? boardElm.textContent = stringToPrint : boardCheatElm.textContent = stringToPrint
 }
-
-function init() {
-  if (isValidBoard(5,5)) {
-    initBoard(5, 5)
-  } else {
-    return 
-  }
-
-  if (isValidBomb(1)) {
-    initBomb(1)
-  } else {
-    return 
-  }
-
-  printBoard(true)
-  printBoard()
-}
-
-init()
